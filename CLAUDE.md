@@ -25,7 +25,7 @@ There are no tests, linters, or build steps.
 |------|---------|
 | `index.html` | Entire site (single page, all sections) |
 | `css/style.css` | All styles — CSS custom properties defined in `:root` |
-| `js/main.js` | Scroll spy (IntersectionObserver), sidebar toggle, smooth scroll, contact form stub |
+| `js/main.js` | Scroll spy (IntersectionObserver), sidebar toggle, smooth scroll, contact form |
 | `js/partials.js` | Injects shared sidebar/overlay HTML for future multi-page expansion; highlights current-page nav link |
 | `js/news-date.js` | **Contains the `NEWS_DATA` array** — source of truth for all news/blog posts |
 | `js/news.js` | Reads `NEWS_DATA`, renders cards into `#news-list`, handles modal open/close |
@@ -53,6 +53,15 @@ Breakpoint is **960 px** (defined in `main.js` media queries and `css/style.css`
 ### Contact form
 
 The form POSTs to Google Forms (`https://docs.google.com/forms/d/e/…/formResponse`). Field `name` attributes map to Google Forms entry IDs. The sending/success/error UI is driven by `.form-overlay` states toggled in `main.js`.
+
+## Git
+
+コミットメッセージは**日本語**で記載する。何を修正・追加したかが一目でわかるよう簡潔にまとめる。
+
+```
+お問い合わせフォームの送信処理を実装
+Cloudflareスクリプトタグの誤コミットを削除
+```
 
 ### Design tokens
 
