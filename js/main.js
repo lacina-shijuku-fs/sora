@@ -121,36 +121,45 @@
     });
   });
 
-  // -------- お問い合わせフォーム（デモ送信） --------
+  // -------- お問い合わせフォーム --------
   const form = document.getElementById('contact-form');
-  const note = document.getElementById('form-note');
-  if (form){
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name = form.name?.value.trim();
-      const email = form.email?.value.trim();
-      const relation = form.relation?.value;
-      const agree = document.getElementById('f-agree')?.checked;
+  const overlay = document.getElementById('form-overlay');
 
-      if (!name || !email || !relation || !agree){
-        if (note){
-          note.textContent = '必須項目をご入力ください。';
-          note.className = 'form-note error';
-        }
+  if (form && overlay) {
+    const showState = (state) => {
+      overlay.querySelectorAll('.form-state').forEach(el => el.classList.remove('active'));
+      overlay.querySelector(`[data-state="${state}"]`)?.classList.add('active');
+      overlay.classList.add('show');
+      overlay.setAttribute('aria-hidden', 'false');
+    };
+
+    const hideOverlay = () => {
+      overlay.classList.remove('show');
+      overlay.setAttribute('aria-hidden', 'true');
+      overlay.querySelectorAll('.form-state').forEach(el => el.classList.remove('active'));
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!form.checkValidity()) {
+        form.reportValidity();
         return;
       }
-
-      if (note){
-        note.textContent = '送信中…';
-        note.className = 'form-note';
-      }
-      setTimeout(() => {
-        if (note){
-          note.textContent = '送信を完了しました。2〜3営業日以内にご返信いたします。';
-          note.className = 'form-note success';
-        }
+      showState('sending');
+      try {
+        await fetch(form.action, {
+          method: 'POST',
+          mode: 'no-cors',
+          body: new FormData(form)
+        });
+        showState('success');
         form.reset();
-      }, 900);
+      } catch {
+        showState('error');
+      }
     });
+
+    document.getElementById('form-reset')?.addEventListener('click', hideOverlay);
+    document.getElementById('form-retry')?.addEventListener('click', hideOverlay);
   }
 })();
