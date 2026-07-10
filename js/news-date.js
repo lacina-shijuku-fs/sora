@@ -1,4 +1,11 @@
 const NEWS_DATA = [
+       {
+    "date": "2026-06-25",
+    "tag": "news",
+    "title": "ラシーナ通信7月号",
+    "excerpt": "ラシーナ通信7月号を公開します。\n7月はイベントに防災DAYがあります。\n南海トラフ地震も近いと言われているからこそ、防災の意識を高める1か月にしたいですね。",
+    "url": "https://canva.link/ugqgwa0x21q0wvz"
+  },
       {
     "date": "2026-06-08",
     "tag": "news",
