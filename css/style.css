@@ -710,6 +710,24 @@ ul, ol{ box-sizing: border-box; }
 .news-tag-news{ background: var(--sora-blue-soft); color: var(--sora-blue-deep); }
 .news-tag-blog{ background: #ffe4c4; color: #b36a00; }
 .news-tag-event{ background: #ffd9e2; color: #b33768; }
+.news-badge-new{
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+  font-family: 'Zen Maru Gothic', sans-serif;
+  color: #fff;
+  background: linear-gradient(135deg, #ff9ecb, #ff6fa5);
+  box-shadow: 0 2px 6px rgba(255, 111, 165, .4);
+  letter-spacing: .02em;
+  animation: news-badge-pop 1.6s ease-in-out infinite;
+}
+@keyframes news-badge-pop{
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
 .news-title{
   margin: 4px 0 6px;
   font-family: 'Zen Maru Gothic', sans-serif;
