@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/jpeg" href="favicon.jpg">
+<title>STEP2 興味の方向｜探求テーマ発見ワークシート</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+<div class="app">
+  <div id="app-header"></div>
+
+  <div class="card">
+    <h2>STEP2　「はい」の数を数えて、興味の方向を見つけよう！</h2>
+    <p class="lead">点数が高いほど「今、気になっている方向」です。六角形が大きく伸びている方向に注目してみましょう。</p>
+    <div id="pdf-area-step2">
+      <p class="hint" id="profile-line" style="text-align:center;"></p>
+      <div class="hexagon-wrap"><div id="hexagon" class="hex-box"></div></div>
+      <div class="top-cats" id="top-cats"></div>
+    </div>
+    <p class="hint" style="text-align:center;">※ポイントは同点があってもOKです。「自分は○○タイプだ」と決める必要はありません。2〜3個の方向を組み合わせるとおもしろいテーマが見つかることもあります。</p>
+    <div class="final-actions">
+      <button type="button" class="btn btn-ghost" id="pdf-btn">グラフをPDFでダウンロード</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <label class="field">①「たしかに自分はこれが気になる」と思ったところ
+      <textarea id="sure"></textarea>
+    </label>
+    <label class="field">②「意外だった」と思ったところ
+      <textarea id="surprising"></textarea>
+    </label>
+    <label class="field">③ 組み合わせてみたい2つの方向（例：C 技術・しくみ × D 表現・文化）
+      <textarea id="combo"></textarea>
+    </label>
+  </div>
+
+  <div id="nav"></div>
+</div>
+
+<script src="app.js"></script>
+<script>
+  renderHeader(2);
+  const state = loadState();
+  if (!state.scores) goTo("step1.html");
+
+  renderHexagon(document.getElementById("hexagon"), state.scores);
+
+  document.getElementById("profile-line").textContent =
+    `名前：${state.profile.name || "-"}　学年：${state.profile.grade || "-"}　日付：${state.profile.date || "-"}`;
+
+  const top2 = topCategories(state.scores, 2);
+  document.getElementById("top-cats").innerHTML =
+    `いちばん高かったもの：${catLabel(top2[0].key)}（${top2[0].score}点）<br>`+
+    `次に高かったもの：${catLabel(top2[1].key)}（${top2[1].score}点）`;
+
+  document.getElementById("pdf-btn").addEventListener("click", async () => {
+    const btn = document.getElementById("pdf-btn");
+    btn.disabled = true;
+    const original = btn.textContent;
+    btn.textContent = "作成中...";
+    const namePart = state.profile.name ? state.profile.name.replace(/\s+/g, "") : "result";
+    try {
+      await elementToPdf(document.getElementById("pdf-area-step2"), `探求テーマ_グラフ_${namePart}.pdf`);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = original;
+    }
+  });
+
+  document.getElementById("sure").value = state.reflections.sure;
+  document.getElementById("surprising").value = state.reflections.surprising;
+  document.getElementById("combo").value = state.reflections.combo;
+
+  navButtons("nav", {
+    prevHref: "step1.html",
+    nextLabel: "次へ →",
+    onNext: () => {
+      state.reflections.sure = document.getElementById("sure").value.trim();
+      state.reflections.surprising = document.getElementById("surprising").value.trim();
+      state.reflections.combo = document.getElementById("combo").value.trim();
+      saveState(state);
+      goTo("step3.html");
+    }
+  });
+</script>
+</body>
+</html>

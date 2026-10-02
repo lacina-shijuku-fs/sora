@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/jpeg" href="favicon.jpg">
+<title>STEP4 掘り下げ｜探求テーマ発見ワークシート</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <div id="app-header"></div>
+
+  <div class="card">
+    <h2>STEP4　キーワードを「自分の興味」に近づけよう！</h2>
+    <p class="lead">気になったキーワードを1つ選び、次の3つを書きます。短い言葉で大丈夫です。</p>
+
+    <label class="field">① 選んだキーワード
+      <select id="keyword"></select>
+    </label>
+    <label class="field">② どこが気になる？（例：人気の理由／変化／人による違い／仕組み／問題点 など）
+      <textarea id="curious"></textarea>
+    </label>
+    <label class="field">③ 自分との接点は？（例：毎日使う／部活で関わる／ニュースで見た／昔から好き など）
+      <textarea id="connection"></textarea>
+    </label>
+    <label class="field">④ もっと知りたいこと（「実はどうなっているんだろう？」と思うこと）
+      <textarea id="wantToKnow"></textarea>
+    </label>
+  </div>
+
+  <div id="nav"></div>
+</div>
+
+<script src="app.js"></script>
+<script>
+  renderHeader(4);
+  const state = loadState();
+  if (!state.scores) goTo("step1.html");
+
+  const allKeywords = CAT_ORDER.flatMap(k =>
+    (state.keywords[k] || []).concat(state.customKeywords[k] ? [state.customKeywords[k]] : [])
+  );
+
+  const select = document.getElementById("keyword");
+  if (allKeywords.length === 0) {
+    select.innerHTML = `<option value="">（STEP3でキーワードを選んでいません）</option>`;
+  } else {
+    select.innerHTML = allKeywords.map(kw =>
+      `<option value="${kw}" ${state.step4.keyword === kw ? "selected" : ""}>${kw}</option>`
+    ).join("");
+  }
+
+  document.getElementById("curious").value = state.step4.curious;
+  document.getElementById("connection").value = state.step4.connection;
+  document.getElementById("wantToKnow").value = state.step4.wantToKnow;
+
+  navButtons("nav", {
+    prevHref: "step3.html",
+    nextLabel: "次へ →",
+    onNext: () => {
+      state.step4.keyword = select.value;
+      state.step4.curious = document.getElementById("curious").value.trim();
+      state.step4.connection = document.getElementById("connection").value.trim();
+      state.step4.wantToKnow = document.getElementById("wantToKnow").value.trim();
+      saveState(state);
+      goTo("step5.html");
+    }
+  });
+</script>
+</body>
+</html>

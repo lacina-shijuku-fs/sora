@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/jpeg" href="favicon.jpg">
+<title>STEP3 キーワード｜探求テーマ発見ワークシート</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <div id="app-header"></div>
+
+  <div class="card">
+    <h2>STEP3　気になるキーワードを集めよう！</h2>
+    <p class="lead">STEP2で点数が高かった方向を中心に、気になる言葉を3〜5個選びましょう。自分で思いついた言葉を「その他」に書き足してもOKです。</p>
+    <div class="select-count" id="count"></div>
+  </div>
+
+  <div class="card" id="cat-list"></div>
+
+  <div id="nav"></div>
+</div>
+
+<script src="app.js"></script>
+<script>
+  renderHeader(3);
+  const state = loadState();
+  if (!state.scores) goTo("step1.html");
+
+  const order = topCategories(state.scores, 6).map(c => c.key);
+
+  const listEl = document.getElementById("cat-list");
+  listEl.innerHTML = order.map(k => {
+    const cat = categoryByKey(k);
+    const selected = state.keywords[k] || [];
+    return `
+      <div class="cat-block">
+        <h3 style="color:${cat.color}">${cat.name}</h3>
+        <p class="cat-desc">${cat.desc}</p>
+        <div class="chip-grid">
+          ${cat.keywords.map(kw => `
+            <label class="chip">
+              <input type="checkbox" data-cat="${k}" value="${kw}" ${selected.includes(kw) ? "checked" : ""}>
+              <span class="chip-label" style="--c:${cat.color}">${kw}</span>
+            </label>
+          `).join("")}
+        </div>
+        <label class="field" style="margin-top:10px;">その他（自由記入）
+          <input type="text" id="other-${k}" value="${state.customKeywords[k] || ""}" placeholder="思いついた言葉があれば">
+        </label>
+      </div>
+    `;
+  }).join("");
+
+  // chip color styling on check
+  document.querySelectorAll(".chip input").forEach(input => {
+    const cat = categoryByKey(input.dataset.cat);
+    const labelEl = input.nextElementSibling;
+    const apply = () => {
+      if (input.checked) {
+        labelEl.style.background = cat.color;
+        labelEl.style.color = "#fff";
+      } else {
+        labelEl.style.background = "";
+        labelEl.style.color = "";
+      }
+    };
+    apply();
+    input.addEventListener("change", () => { apply(); updateCount(); });
+  });
+
+  function updateCount() {
+    const n = document.querySelectorAll(".chip input:checked").length;
+    const countEl = document.getElementById("count");
+    countEl.textContent = `選択中：${n}個（目安は3〜5個）`;
+    countEl.className = "select-count" + (n < 3 || n > 5 ? " warn" : "");
+  }
+  updateCount();
+
+  navButtons("nav", {
+    prevHref: "step2.html",
+    nextLabel: "次へ →",
+    onNext: () => {
+      const keywords = { A: [], B: [], C: [], D: [], E: [], F: [] };
+      document.querySelectorAll(".chip input:checked").forEach(input => {
+        keywords[input.dataset.cat].push(input.value);
+      });
+      const customKeywords = {};
+      order.forEach(k => {
+        customKeywords[k] = document.getElementById(`other-${k}`).value.trim();
+      });
+      state.keywords = Object.assign(state.keywords, keywords);
+      state.customKeywords = Object.assign(state.customKeywords, customKeywords);
+      saveState(state);
+      goTo("step4.html");
+    }
+  });
+</script>
+</body>
+</html>

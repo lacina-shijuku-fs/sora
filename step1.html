@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/jpeg" href="favicon.jpg">
+<title>STEP1 直感チェック｜探求テーマ発見ワークシート</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <div id="app-header"></div>
+
+  <div class="card">
+    <h2>STEP1　直感チェック：何に「気になる」が向く？</h2>
+    <p class="lead">30個の文について、1（あてはまらない）〜5（あてはまる）で直感的に選んでください。</p>
+  </div>
+
+  <div class="card" id="questions"></div>
+
+  <div id="nav"></div>
+</div>
+
+<script src="app.js"></script>
+<script>
+  renderHeader(1);
+  const state = loadState();
+
+  const wrap = document.getElementById("questions");
+  wrap.innerHTML = QUESTIONS.map(q => `
+    <div class="question-row">
+      <div class="question-text">${q.id}. ${q.text}</div>
+      <div class="scale">
+        ${[1,2,3,4,5].map(v => `
+          <label>
+            <input type="radio" name="q${q.id}" value="${v}" ${Number(state.answers[q.id]) === v ? "checked" : ""}>
+            <span class="opt"><span class="num">${v}</span>${v === 1 ? "あてはまらない" : v === 5 ? "あてはまる" : ""}</span>
+          </label>
+        `).join("")}
+      </div>
+    </div>
+  `).join("");
+
+  navButtons("nav", {
+    prevHref: "index.html",
+    nextLabel: "次へ →",
+    onNext: () => {
+      const answers = {};
+      let missing = 0;
+      QUESTIONS.forEach(q => {
+        const checked = document.querySelector(`input[name="q${q.id}"]:checked`);
+        if (checked) answers[q.id] = Number(checked.value);
+        else missing++;
+      });
+      if (missing > 0) {
+        alert(`未回答の質問が ${missing} 個あります。すべて選んでから次へ進んでください。`);
+        return;
+      }
+      state.answers = answers;
+      state.scores = computeScores(answers);
+      saveState(state);
+      goTo("step2.html");
+    }
+  });
+</script>
+</body>
+</html>

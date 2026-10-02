@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/jpeg" href="favicon.jpg">
+<title>スタッフ用一覧｜探求テーマ発見ワークシート</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .student-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 2px dashed var(--border);
+    cursor: pointer;
+  }
+  .student-row:last-child { border-bottom: none; }
+  .student-row .name { font-weight: 900; }
+  .student-row .meta { font-size: .82rem; color: var(--muted); }
+  .detail-panel { display: none; padding: 10px 0 18px; }
+  .detail-panel.open { display: block; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div id="app-header"></div>
+
+  <div class="card">
+    <h2>スタッフ用一覧</h2>
+    <p class="lead" id="status-line">読み込み中...</p>
+    <div id="list-area"></div>
+  </div>
+
+  <div class="final-actions">
+    <button type="button" class="btn btn-ghost" id="reload-btn">再読み込み</button>
+    <button type="button" class="btn btn-ghost" id="logout-btn">ログアウト</button>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+  renderHeader(0);
+  const auth = requireStaffAuth();
+
+  if (auth) {
+    document.getElementById("logout-btn").addEventListener("click", logout);
+    document.getElementById("reload-btn").addEventListener("click", load);
+
+    function renderList(records) {
+      const listEl = document.getElementById("list-area");
+      if (records.length === 0) {
+        listEl.innerHTML = "<p class=\"hint\">まだ提出はありません。</p>";
+        return;
+      }
+      listEl.innerHTML = records.map((record, i) => `
+        <div class="student-row" data-idx="${i}">
+          <div>
+            <div class="name">${record.名前 || "(名前なし)"}${record.トラック ? `（${record.トラック}）` : ""}</div>
+            <div class="meta">学年：${record.学年 || "-"}　日付：${record.日付 || "-"}</div>
+          </div>
+          <div class="meta">キーワード：${record.キーワード || "-"}</div>
+        </div>
+        <div class="detail-panel" id="detail-${i}">
+          <p class="hint" id="detail-profile-${i}"></p>
+          <div class="hexagon-wrap"><div id="hexagon-${i}" class="hex-box hex-box-sm"></div></div>
+          <div class="summary-box">${(record.サマリー || "").replace(/</g, "&lt;")}</div>
+        </div>
+      `).join("");
+
+      records.forEach((record, i) => {
+        document.querySelector(`.student-row[data-idx="${i}"]`).addEventListener("click", () => {
+          const panel = document.getElementById(`detail-${i}`);
+          const isOpen = panel.classList.contains("open");
+          document.querySelectorAll(".detail-panel.open").forEach(p => p.classList.remove("open"));
+          if (!isOpen) {
+            panel.classList.add("open");
+            if (!panel.dataset.rendered) {
+              const isES = record.トラック === "小学生";
+              renderHexagon(document.getElementById(`hexagon-${i}`), scoresFromRecord(record), {
+                maxVal: isES ? 10 : 25,
+                categories: isES ? ES_CATEGORIES : CATEGORIES
+              });
+              panel.dataset.rendered = "1";
+            }
+          }
+        });
+      });
+    }
+
+    async function load() {
+      const statusEl = document.getElementById("status-line");
+      statusEl.style.display = "block";
+      statusEl.textContent = "読み込み中...";
+      document.getElementById("list-area").innerHTML = "";
+      const result = await apiCall("get_all_results", { password: auth.password });
+      if (!result.ok) {
+        statusEl.textContent = `読み込めませんでした（${result.error || "不明なエラー"}）。`;
+        return;
+      }
+      statusEl.style.display = "none";
+      renderList(result.records);
+    }
+
+    load();
+  }
+</script>
+</body>
+</html>

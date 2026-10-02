@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/jpeg" href="favicon.jpg">
+<title>ログイン｜探求テーマ発見ワークシート</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <div id="app-header"></div>
+
+  <div class="card login-card">
+    <button type="button" class="staff-link" id="toggle-staff">スタッフ用</button>
+    <h2 id="login-title">ログイン</h2>
+
+    <div id="student-form">
+      <p class="lead">スタッフから配られた名前とパスワードを入力してください。</p>
+      <label class="field">名前
+        <input type="text" id="student-name" placeholder="例：山田 太郎">
+      </label>
+      <label class="field">パスワード
+        <input type="text" id="student-password" placeholder="スタッフから配られたパスワード">
+      </label>
+      <p class="hint" id="student-error" style="color:#c2410c;"></p>
+      <div class="intro-buttons">
+        <button type="button" class="btn btn-primary" id="student-login-btn">ログイン</button>
+      </div>
+    </div>
+
+    <div id="staff-form" style="display:none;">
+      <p class="lead">スタッフ用のログインです。</p>
+      <label class="field">スタッフパスワード
+        <input type="text" id="staff-password" placeholder="スタッフ共通パスワード">
+      </label>
+      <p class="hint" id="staff-error" style="color:#c2410c;"></p>
+      <div class="intro-buttons">
+        <button type="button" class="btn btn-primary" id="staff-login-btn">ログイン</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+  renderHeader(0);
+
+  const studentForm = document.getElementById("student-form");
+  const staffForm = document.getElementById("staff-form");
+
+  const toggleBtn = document.getElementById("toggle-staff");
+  const titleEl = document.getElementById("login-title");
+  let staffMode = false;
+  toggleBtn.addEventListener("click", () => {
+    staffMode = !staffMode;
+    studentForm.style.display = staffMode ? "none" : "block";
+    staffForm.style.display = staffMode ? "block" : "none";
+    toggleBtn.textContent = staffMode ? "生徒用に戻る" : "スタッフ用";
+    titleEl.textContent = staffMode ? "スタッフログイン" : "ログイン";
+  });
+
+  document.getElementById("student-login-btn").addEventListener("click", async () => {
+    const name = document.getElementById("student-name").value.trim();
+    const password = document.getElementById("student-password").value.trim();
+    const errorEl = document.getElementById("student-error");
+    errorEl.textContent = "";
+    if (!name || !password) {
+      errorEl.textContent = "名前とパスワードを入力してください。";
+      return;
+    }
+    const btn = document.getElementById("student-login-btn");
+    btn.disabled = true;
+    const result = await apiCall("login_student", { name, password });
+    btn.disabled = false;
+    if (result.ok) {
+      sessionStorage.setItem(AUTH_KEY_STUDENT, JSON.stringify({ name, password }));
+      goTo("choose.html");
+    } else {
+      errorEl.textContent = result.error || "ログインできませんでした。";
+    }
+  });
+
+  document.getElementById("staff-login-btn").addEventListener("click", async () => {
+    const password = document.getElementById("staff-password").value.trim();
+    const errorEl = document.getElementById("staff-error");
+    errorEl.textContent = "";
+    if (!password) {
+      errorEl.textContent = "パスワードを入力してください。";
+      return;
+    }
+    const btn = document.getElementById("staff-login-btn");
+    btn.disabled = true;
+    const result = await apiCall("login_staff", { password });
+    btn.disabled = false;
+    if (result.ok) {
+      sessionStorage.setItem(AUTH_KEY_STAFF, JSON.stringify({ password }));
+      goTo("staff.html");
+    } else {
+      errorEl.textContent = result.error || "ログインできませんでした。";
+    }
+  });
+</script>
+</body>
+</html>
