@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/jpeg" href="favicon.jpg">
+<title>探求テーマ発見ワークシート</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <div id="app-header"></div>
+
+  <div class="card">
+    <h2>「好き」や「気になる」から、調べてみたい問いをつくろう</h2>
+    <p class="lead">
+      まず30個の文を直感でチェックします。「少しでも気になる」「もっと知りたい」と思ったら
+      点数を高めに、そうでなければ低めに選んでください。迷ったときは、深く考えすぎず
+      今の気分で選んでOKです。
+    </p>
+
+    <label class="field">名前
+      <input type="text" id="name" placeholder="例：山田 太郎">
+    </label>
+    <label class="field">学年
+      <input type="text" id="grade" placeholder="例：中学2年">
+    </label>
+    <label class="field">日付
+      <input type="date" id="date">
+    </label>
+  </div>
+
+  <div class="intro-buttons">
+    <button type="button" class="btn btn-primary" id="start-btn">はじめる →</button>
+  </div>
+  <div class="intro-buttons">
+    <a class="btn btn-ghost" href="choose.html">← 戻る</a>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+  renderHeader(0);
+  const auth = requireStudentAuth();
+
+  if (auth) {
+    const state = loadState();
+    document.getElementById("name").value = auth.name;
+    document.getElementById("name").disabled = true;
+    document.getElementById("grade").value = state.profile.grade;
+    document.getElementById("date").value = state.profile.date || new Date().toISOString().slice(0, 10);
+
+    document.getElementById("start-btn").addEventListener("click", () => {
+      state.profile.name = auth.name;
+      state.profile.grade = document.getElementById("grade").value.trim();
+      state.profile.date = document.getElementById("date").value;
+      saveState(state);
+      goTo("step1.html");
+    });
+  }
+</script>
+</body>
+</html>
