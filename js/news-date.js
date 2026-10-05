@@ -5,7 +5,7 @@ const NEWS_DATA = [
     "title": "ラシーナ通信10月号が完成しました",
     "excerpt": "10月はAAA（志塾グループの文化祭）や、宿泊学習などイベント盛りだくさん！\n皆で楽しめるようにまずは体調管理ですね！",
     "url": "https://canva.link/2s6ikgrpbqvbkf4"
-  }
+  },
   {
     date: "2026-06-25",
     tag: "news",
