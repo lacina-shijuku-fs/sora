@@ -710,6 +710,16 @@ ul, ol{ box-sizing: border-box; }
 .news-tag-news{ background: var(--sora-blue-soft); color: var(--sora-blue-deep); }
 .news-tag-blog{ background: #ffe4c4; color: #b36a00; }
 .news-tag-event{ background: #ffd9e2; color: #b33768; }
+.news-badge-new{
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #e8504f;
+  color: #fff;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: .08em;
+  line-height: 1.5;
+}
 .news-title{
   margin: 4px 0 6px;
   font-family: 'Zen Maru Gothic', sans-serif;
